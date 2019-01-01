@@ -16,9 +16,21 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    
+    public function __construct()
     {
-        return User::latest()->paginate(10);
+        $this->middleware('auth:api');
+    }
+    
+
+
+     public function index()
+    {
+        if(\Gate::allows('isAdminOrAuthor')){
+            
+            return User::latest()->paginate(2);
+        }
+        
     }
 
     /**
@@ -32,7 +44,7 @@ class UserController extends Controller
         $this->validate($request,[
             'name' => 'required|string|max:191',
             'email' => 'required|string|email|max:191|unique:users',
-            'password' => 'required|string|min:6'
+            'password' => 'required|min:6'
 
         ]);
 
@@ -58,6 +70,46 @@ class UserController extends Controller
         //
     }
 
+    public function profile()
+    {
+        return auth('api')->user();
+    }
+
+    
+    public function updateProfile(Request $request)
+    {
+        $user = auth('api')->user();
+
+        $this->validate($request,[
+            'name' => 'required|string|max:191',
+            'email' => 'required|string|email|max:191|unique:users,email,'.$user->id ,
+            'password' => 'sometimes|min:6'
+
+        ]);
+
+        $cphoto=$user->photo;
+
+        if($request->photo != $cphoto){
+
+            $name = time().'.'.explode('/', explode(':', substr($request->photo,0,strpos($request->photo, ';')))[1])[1];
+            \Image::make($request->photo)->save(public_path('images/profile/').$name);
+            
+            $request->merge(['photo' => $name]);
+
+            $cphotopath=public_path('images/profile/').$cphoto;
+            if(file_exists($cphotopath)){
+               @unlink($cphotopath); 
+            }
+        }
+
+        if(!empty($request->password)){
+            $request->merge(['password' => Hash::make($request['password'])]);
+        }
+
+        $user->update($request->all());
+        return['message' => 'success'];
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -67,7 +119,16 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $user=User::findorFail($id);
+
+        $this->validate($request,[
+            'name' => 'required|string|max:191',
+            'email' => 'required|string|email|max:191|unique:users,email,'.$user->id ,
+            'password' => 'sometimes|min:6'
+
+        ]);
+
+        $user->update($request->all());
     }
 
     /**
@@ -78,6 +139,12 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        
+        $this->authorize('isAdmin');
+
+        $user=User::findorFail($id);
+
+        $user->delete();
+        return['message'=>'User Deleted'];
     }
 }
