@@ -232,6 +232,16 @@
             }
         },
         created() {
+            Fire.$on('searching',() => {
+                let query = this.$parent.search;
+                axios.get('api/findUser?q='+ query).then( (data) => {
+                    
+                    this.users = data.data;
+                }).catch( ()=>{
+
+                });
+            });
+            
             this.loadUsers();
 
             /** To listen an event (Change in the users list) and request accordingly */

@@ -79,6 +79,7 @@ const routes =[
     {path: '/dashboard',component: require('./components/Dashboard.vue').default},
     {path: '/profile',component: require('./components/Profile.vue').default},
     {path: '/users',component: require('./components/Users.vue').default},
+    {path: '*',component: require('./components/NotFound.vue').default},
 ]
 const router=new VueRouter({
     mode: 'history',    //for changing the url
@@ -151,5 +152,16 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 
 const app = new Vue({
     el: '#app',
-    router
+    router,
+    
+    data : {
+        search : ''
+    },
+
+    methods : {
+        searchIt : _.debounce(() => {           //Will wait for .5 second and then call the function.
+            Fire.$emit('searching');  
+        },500)
+    }
+
 });

@@ -31,16 +31,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
       </li>
     </ul>
     <!-- SEARCH FORM -->
-    <form class="form-inline ml-3">
+    <div class="col-3">  
       <div class="input-group input-group-sm">
-        <input class="form-control form-control-navbar" type="search" placeholder="Search" aria-label="Search">
+        <input class="form-control form-control-navbar" @keyup="searchIt" v-model="search" type="search" placeholder="Search" aria-label="Search">
         <div class="input-group-append">
-          <button class="btn btn-navbar" type="submit">
+          <button class="btn btn-navbar" @click="searchIt">
             <i class="fa fa-search"></i>
           </button>
         </div>
       </div>
-    </form>
+    </div>
 
   </nav>
   <!-- /.navbar -->
@@ -158,7 +158,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       Anything you want
     </div>
     <!-- Default to the left -->
-    <strong>Copyright &copy; 2014-2018 <a href="https://adminlte.io">AdminLTE.io</a>.</strong> All rights reserved.
+    <strong>Copyright &copy; 2018-2019 AdminPanel.</strong> All rights reserved.
   </footer>
 </div>
 <!-- ./wrapper -->
